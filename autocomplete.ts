@@ -9,6 +9,17 @@ export const enum EventTrigger {
     Focus = 1
 }
 
+export const enum InputRestriction {
+    /**
+     * User can only select a value from autocomplete; custom input will be reverted on blur event
+     */
+    Predefined = 1,
+    /**
+     * User can only select a value from autocomplete; custom input will be reverted on blur event, unless it is an empty string
+     */
+    PredefinedOrEmpty = 2
+}
+
 export interface AutocompleteItem {
     label?: string;
     group?: string;
@@ -40,6 +51,10 @@ export interface AutocompleteSettings<T extends AutocompleteItem> {
      * Prevents automatic form submit when ENTER is pressed
      */
     preventSubmit?: boolean;
+    /**
+     * Restrict values that can be entered into the input field. When this option is undefined or null, any input will be accepted
+     */
+    inputRestriction?: InputRestriction;
 }
 
 export interface AutocompleteResult {
@@ -83,6 +98,8 @@ export default function autocomplete<T extends AutocompleteItem>(settings: Autoc
     let selected: T | undefined;
     let keypressCounter = 0;
     let debounceTimer : number | undefined;
+    
+    const inputRestriction = settings.inputRestriction;
 
     if (settings.minLength !== undefined) {
         minLen = settings.minLength;
@@ -93,6 +110,8 @@ export default function autocomplete<T extends AutocompleteItem>(settings: Autoc
     }
 
     const input: HTMLInputElement = settings.input;
+
+    let initialValue: string = input.value;
 
     container.className = "autocomplete " + (settings.className || "");
 
@@ -241,6 +260,7 @@ export default function autocomplete<T extends AutocompleteItem>(settings: Autoc
             if (div) {
                 div.addEventListener("click", function(ev: MouseEvent): void {
                     settings.onSelect(item, input);
+                    initialValue = input.value
                     clear();
                     ev.preventDefault();
                     ev.stopPropagation();
@@ -400,6 +420,7 @@ export default function autocomplete<T extends AutocompleteItem>(settings: Autoc
         if (keyCode === Keys.Enter) {
             if (selected) {
                 settings.onSelect(selected, input);
+                initialValue = input.value;
                 clear();
             }
     
@@ -441,6 +462,12 @@ export default function autocomplete<T extends AutocompleteItem>(settings: Autoc
     }
 
     function blurEventHandler(): void {
+        if (inputRestriction) {
+            input.value = inputRestriction === InputRestriction.PredefinedOrEmpty && !input.value
+                ? ""
+                : initialValue;
+        }
+
         // we need to delay clear, because when we click on an item, blur will be called before click and remove items from DOM
         setTimeout(() => {
             if (doc.activeElement !== input) {

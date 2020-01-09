@@ -2,6 +2,16 @@ export declare const enum EventTrigger {
     Keyboard = 0,
     Focus = 1
 }
+export declare const enum InputRestriction {
+    /**
+     * User can only select a value from autocomplete; custom input will be reverted on blur event
+     */
+    Predefined = 1,
+    /**
+     * User can only select a value from autocomplete; custom input will be reverted on blur event, unless it is an empty string
+     */
+    PredefinedOrEmpty = 2
+}
 export interface AutocompleteItem {
     label?: string;
     group?: string;
@@ -32,6 +42,10 @@ export interface AutocompleteSettings<T extends AutocompleteItem> {
      * Prevents automatic form submit when ENTER is pressed
      */
     preventSubmit?: boolean;
+    /**
+     * Restrict values that can be entered into the input field. When this option is undefined or null, any input will be accepted
+     */
+    inputRestriction?: InputRestriction;
 }
 export interface AutocompleteResult {
     destroy: () => void;

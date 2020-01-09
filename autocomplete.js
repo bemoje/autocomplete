@@ -27,6 +27,7 @@
       var selected;
       var keypressCounter = 0;
       var debounceTimer;
+      var inputRestriction = settings.inputRestriction;
       if (settings.minLength !== undefined) {
           minLen = settings.minLength;
       }
@@ -34,6 +35,7 @@
           throw new Error("input undefined");
       }
       var input = settings.input;
+      var initialValue = input.value;
       container.className = "autocomplete " + (settings.className || "");
       // IOS implementation for fixed positioning has many bugs, so we will use absolute positioning
       containerStyle.position = "absolute";
@@ -157,6 +159,7 @@
               if (div) {
                   div.addEventListener("click", function (ev) {
                       settings.onSelect(item, input);
+                      initialValue = input.value;
                       clear();
                       ev.preventDefault();
                       ev.stopPropagation();
@@ -303,6 +306,7 @@
           if (keyCode === 13 /* Enter */) {
               if (selected) {
                   settings.onSelect(selected, input);
+                  initialValue = input.value;
                   clear();
               }
               if (preventSubmit) {
@@ -340,6 +344,11 @@
           }
       }
       function blurEventHandler() {
+          if (inputRestriction) {
+              input.value = inputRestriction === 2 /* PredefinedOrEmpty */ && !input.value
+                  ? ""
+                  : initialValue;
+          }
           // we need to delay clear, because when we click on an item, blur will be called before click and remove items from DOM
           setTimeout(function () {
               if (doc.activeElement !== input) {
