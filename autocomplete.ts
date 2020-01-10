@@ -260,7 +260,7 @@ export default function autocomplete<T extends AutocompleteItem>(settings: Autoc
             if (div) {
                 div.addEventListener("click", function(ev: MouseEvent): void {
                     settings.onSelect(item, input);
-                    initialValue = input.value
+                    initialValue = input.value;
                     clear();
                     ev.preventDefault();
                     ev.stopPropagation();

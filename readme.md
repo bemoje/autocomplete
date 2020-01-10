@@ -118,6 +118,7 @@ You can pass the following options to `autocomplete`:
 |`customize`|Callback for additional autocomplete customization after rendering is finished. Use this function if you want to change autocomplete default position.|`undefined`|
 |`preventSubmit`|Prevents automatic form submit when ENTER is pressed.|`false`|
 |`showOnFocus`|Displays suggestions on focus of the input element. Note that if `true`, the minLength property will be ignored and it will always call `fetch`.|`false`|
+|`inputRestriction`|Restrict values that can be entered into the input field. When this option is undefined, any input will be accepted.|`undefined`|
 
 ### Sample config using all options
 
